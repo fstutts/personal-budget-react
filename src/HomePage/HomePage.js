@@ -1,6 +1,28 @@
-import React from 'react';
+import React, {useState, useEffect } from 'react';
+import { budgetService } from '../services/budgetService';
+import BudgetChart from '../components/BudgetChart';
+import D3Chart from '../components/D3Chart';
+
 
 function HomePage() {
+    const[budgetData, setBudgetData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchBudgetData = async () => {
+            try {
+                const response = await budgetService.getMockBudgetData();
+                setBudgetData(response.data.myBudget);
+
+            } catch (error) {
+                console.error('Error fetching budget data:', error);
+            } finally {
+                setLoading(false);
+            }
+
+        };
+        fetchBudgetData();
+    }, []);
   return (
     <main className="center" id="main">
     
@@ -64,16 +86,21 @@ function HomePage() {
             </article>
     
             <article>
-                <h1>Chart</h1>
-                <p>
-                    <canvas id="myChart" width="400" height="400"></canvas>
-                </p>
+                <h1>Chart.js Budget Chart</h1>
+                {loading ? (
+                    <p>Loading chart...</p>
+                ) : (
+                    <BudgetChart budgetData={budgetData} />
+                )}
             </article>
 
             <article>
-                <h1>D3JS Chart</h1>
-                <div id="d3Chart" style={{width: '960px', height: '500px', position: 'relative', margin: '0 auto'}}>
-                </div>
+                <h1>D3.js Budget Chart</h1>
+                {loading ? (
+                    <p>Loading chart...</p>
+                ) : (
+                    <D3Chart budgetData={budgetData} />
+                )}
             </article>
 
         </section>
